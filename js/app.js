@@ -161,49 +161,49 @@ var renderAnswerFeedbackText = (state, element) => {
   element.text(text);
 };
 
-function renderNextButtonText(state, element) {
-    var text = state.currentQuestionIndex < state.questions.length - 1 ?
+var renderNextButtonText = (state, element) => {
+    let text = state.currentQuestionIndex < state.questions.length - 1 ?
       "Next" : "How did I do?";
   element.text(text);
 };
 
-function renderFinalFeedbackText(state, element) {
-  var text = "You got " + state.score + " out of " +
-    state.questions.length + " questions right.";
+var renderFinalFeedbackText = (state, element) => {
+  let text = `You got ${state.score} out of ${state.questions.length} ` + 
+  `questions right.`;
   element.text(text);
 };
 
 // Event handlers
-var PAGE_ELEMENTS = {
+const PAGE_ELEMENTS = {
   'start': $('.start-page'),
   'question': $('.question-page'),
   'answer-feedback': $('.answer-feedback-page'),
   'final-feedback': $('.final-feedback-page')
 };
 
-$("form[name='game-start']").submit(function(event) {
+$("form[name='game-start']").submit(event => {
   event.preventDefault();
   setRoute(state, 'question');
   renderApp(state, PAGE_ELEMENTS);
 });
 
-$(".restart-game").click(function(event){
+$(".restart-game").click(event => {
   event.preventDefault();
   resetGame(state);
   renderApp(state, PAGE_ELEMENTS);
 });
 
-$("form[name='current-question']").submit(function(event) {
+$("form[name='current-question']").submit(event => {
   event.preventDefault();
-  var answer = $("input[name='user-answer']:checked").val();
+  let answer = $("input[name='user-answer']:checked").val();
   answer = parseInt(answer, 10);
   answerQuestion(state, answer);
   renderApp(state, PAGE_ELEMENTS);
 });
 
-$(".see-next").click(function(event) {
+$(".see-next").click(event => {
   advance(state);
   renderApp(state, PAGE_ELEMENTS);
 });
 
-$(function() { renderApp(state, PAGE_ELEMENTS); });
+$(() => renderApp(state, PAGE_ELEMENTS));
