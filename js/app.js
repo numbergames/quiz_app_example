@@ -47,31 +47,31 @@ var state = {
 };
 
 // State modification functions
-function setRoute(state, route) {
-  state.route = route;
-};
+var setRoute = (state, route) => state.route = route;
 
-function resetGame(state) {
+var resetGame = state => {
   state.score = 0;
   state.currentQuestionIndex = 0;
   setRoute(state, 'start');
 };
 
-function answerQuestion(state, answer) {
-  var currentQuestion = state.questions[state.currentQuestionIndex];
+var answerQuestion = (state, answer) => {
+  var {questions, currentQuestionIndex} = state;
+  var currentQuestion = questions[currentQuestionIndex];
+  
   state.lastAnswerCorrect = currentQuestion.correctChoiceIndex === answer;
+
   if (state.lastAnswerCorrect) {
     state.score++;
   }
+  
   selectFeedback(state);
   setRoute(state, 'answer-feedback');
 };
 
-function selectFeedback(state) {
-  state.feedbackRandom = Math.random();
-};
+var selectFeedback = state => state.feedbackRandom = Math.random();
 
-function advance(state) {
+var advance = state => {
   state.currentQuestionIndex++;
   if (state.currentQuestionIndex === state.questions.length) {
     setRoute(state, 'final-feedback');
@@ -82,24 +82,25 @@ function advance(state) {
 };
 
 // Render functions
-function renderApp(state, elements) {
+var renderApp = (state, elements) => {
   // default to hiding all routes, then show the current route
-  Object.keys(elements).forEach(function(route) {
-    elements[route].hide();
-  });
-  elements[state.route].show();
+  Object.keys(elements).forEach(route =>  elements[route].hide());
 
-  if (state.route === 'start') {
-      renderStartPage(state, elements[state.route]);
+  var {route} = state;
+  var element = elements[route];
+  element.show();
+
+  if (route === 'start') {
+      renderStartPage(state, element);
   }
-  else if (state.route === 'question') {
-      renderQuestionPage(state, elements[state.route]);
+  else if (route === 'question') {
+      renderQuestionPage(state, element);
   }
-  else if (state.route === 'answer-feedback') {
-    renderAnswerFeedbackPage(state, elements[state.route]);
+  else if (route === 'answer-feedback') {
+    renderAnswerFeedbackPage(state, element);
   }
-  else if (state.route === 'final-feedback') {
-    renderFinalFeedbackPage(state, elements[state.route]);
+  else if (route === 'final-feedback') {
+    renderFinalFeedbackPage(state, element);
   }
 };
 
@@ -107,59 +108,56 @@ function renderApp(state, elements) {
 // the start page is preloaded in our HTML, but we've included
 // the function and used above in our routing system so that this
 // application view is accounted for in our system
-function renderStartPage(state, element) {
-};
+var renderStartPage = (state, element) => {};
 
-function renderQuestionPage(state, element) {
+var renderQuestionPage = (state, element) => {
   renderQuestionCount(state, element.find('.question-count'));
   renderQuestionText(state, element.find('.question-text'));
   renderChoices(state, element.find('.choices'));
 };
 
-function renderAnswerFeedbackPage(state, element) {
+var renderAnswerFeedbackPage = (state, element) => {
   renderAnswerFeedbackHeader(state, element.find(".feedback-header"));
   renderAnswerFeedbackText(state, element.find(".feedback-text"));
   renderNextButtonText(state, element.find(".see-next"));
 };
 
-function renderFinalFeedbackPage(state, element) {
+var renderFinalFeedbackPage = (state, element) => {
   renderFinalFeedbackText(state, element.find('.results-text'));
 };
 
-function renderQuestionCount(state, element) {
-  var text = (state.currentQuestionIndex + 1) + "/" + state.questions.length;
+var renderQuestionCount = (state, element) => {
+  let text = `${state.currentQuestionIndex + 1} / ${state.questions.length}`;
   element.text(text);
 };
 
-function renderQuestionText(state, element) {
-  var currentQuestion = state.questions[state.currentQuestionIndex];
+var renderQuestionText = (state, element) => {
+  let currentQuestion = state.questions[state.currentQuestionIndex];
   element.text(currentQuestion.text);
 };
 
-function renderChoices(state, element) {
-  var currentQuestion = state.questions[state.currentQuestionIndex];
-  var choices = currentQuestion.choices.map(function(choice, index) {
-    return (
-      '<li>' +
-        '<input type="radio" name="user-answer" value="' + index + '" required>' +
-        '<label>' + choice + '</label>' +
-      '</li>'
-    );
-  });
+var renderChoices = (state, element) => {
+  let currentQuestion = state.questions[state.currentQuestionIndex];
+  
+  let choices = currentQuestion.choices.map((choice, index) =>
+      `<li><input type="radio" name="user-answer" value="${index}" ` +
+      `required><label>${choice}</label></li>`
+  );
+  
   element.html(choices);
 };
 
-function renderAnswerFeedbackHeader(state, element) {
-  var html = state.lastAnswerCorrect ?
+var renderAnswerFeedbackHeader = (state, element) => {
+  let html = state.lastAnswerCorrect ?
       "<h6 class='user-was-correct'>correct</h6>" :
       "<h1 class='user-was-incorrect'>Wrooonnnngggg!</>";
 
   element.html(html);
 };
 
-function renderAnswerFeedbackText(state, element) {
-  var choices = state.lastAnswerCorrect ? state.praises : state.admonishments;
-  var text = choices[Math.floor(state.feedbackRandom * choices.length)];
+var renderAnswerFeedbackText = (state, element) => {
+  let choices = state.lastAnswerCorrect ? state.praises : state.admonishments;
+  let text = choices[Math.floor(state.feedbackRandom * choices.length)];
   element.text(text);
 };
 
